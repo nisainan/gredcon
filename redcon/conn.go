@@ -1,5 +1,7 @@
 package redcon
 
+import "redcon/pkg/resparse/credis"
+
 type Conn interface {
 	// WriteError writes an error to the client.
 	WriteError(msg string)
@@ -67,10 +69,10 @@ type Conn interface {
 
 	// ReadPipeline returns all commands in current pipeline, if any
 	// The commands are removed from the pipeline.
-	ReadPipeline() []Command
+	ReadPipeline() []*credis.Resp
 	// PeekPipeline returns all commands in current pipeline, if any.
 	// The commands remain in the pipeline.
-	PeekPipeline() []Command
+	PeekPipeline() []*credis.Resp
 }
 
 //type DetachedConn interface {

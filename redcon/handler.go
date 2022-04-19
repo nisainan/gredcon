@@ -1,11 +1,13 @@
 package redcon
 
+import "redcon/pkg/resparse/credis"
+
 type Handler interface {
-	ServeRESP(conn Conn, cmd Command)
+	ServeRESP(conn Conn, resp *credis.Resp)
 }
 
-type HandlerFunc func(conn Conn, cmd Command)
+type HandlerFunc func(conn Conn, resp *credis.Resp)
 
-func (f HandlerFunc) ServeRESP(conn Conn, cmd Command) {
-	f(conn, cmd)
+func (f HandlerFunc) ServeRESP(conn Conn, resp *credis.Resp) {
+	f(conn, resp)
 }

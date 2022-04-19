@@ -2,6 +2,7 @@ package redcon
 
 import (
 	"github.com/panjf2000/gnet"
+	"redcon/pkg/resparse/credis"
 	"time"
 )
 
@@ -34,13 +35,13 @@ func (c *RedCon) WriteAny(v interface{})      { c.wr.WriteAny(v) }
 func (c *RedCon) Context() interface{}        { return c.ctx }
 func (c *RedCon) SetContext(v interface{})    { c.ctx = v }
 func (c *RedCon) SetReadBuffer(n int)         {}
-func (c *RedCon) ReadPipeline() []Command {
-	cmds := c.rd.cmds
-	c.rd.cmds = nil
-	return cmds
+func (c *RedCon) ReadPipeline() []*credis.Resp {
+	resps := c.rd.resps
+	c.rd.resps = nil
+	return resps
 }
-func (c *RedCon) PeekPipeline() []Command {
-	return c.rd.cmds
+func (c *RedCon) PeekPipeline() []*credis.Resp {
+	return c.rd.resps
 }
 
 func NewRedcon() *RedCon {

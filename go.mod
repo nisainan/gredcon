@@ -4,7 +4,6 @@ go 1.17
 
 require (
 	github.com/panjf2000/gnet v1.6.4
-	github.com/panjf2000/gnet/v2 v2.0.2
 )
 
 require (

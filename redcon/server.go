@@ -5,6 +5,7 @@ import (
 	"github.com/panjf2000/gnet"
 	"log"
 	"net"
+	"redcon/pkg/resparse/credis"
 	"sync"
 	"time"
 )
@@ -15,7 +16,7 @@ type Server struct {
 	mu        sync.RWMutex
 	net       string
 	laddr     string
-	handler   func(conn Conn, cmd Command)
+	handler   func(conn Conn, resp *credis.Resp)
 	accept    func(conn Conn) bool
 	closed    func(conn Conn, err error)
 	conns     map[gnet.Conn]*RedCon
@@ -55,26 +56,41 @@ func (s *Server) React(frame []byte, conn gnet.Conn) (out []byte, action gnet.Ac
 	defer s.mu.RUnlock()
 	c := s.conns[conn]
 	c.rd.Write(frame)
-	cmds, lastbyte, err := ReadCommands(c.rd.Bytes())
-	if err != nil {
-		defer c.wr.Flush()
-		c.wr.WriteError("ERR " + err.Error())
-		return c.wr.Buffer(), gnet.None
-	}
-	c.rd.cmds = append(c.rd.cmds, cmds...)
-	c.rd.Reset()
-	if len(lastbyte) > 0 {
-		c.rd.Write(lastbyte)
-	} else {
-		for len(c.rd.cmds) > 0 {
-			cmd := c.rd.cmds[0]
-			if len(c.rd.cmds) == 1 {
-				c.rd.cmds = nil
-			} else {
-				c.rd.cmds = c.rd.cmds[1:]
-			}
-			s.handler(c, cmd)
+	decoder := credis.NewDecoderSize(c.rd, 1024)
+	//cmds, lastbyte, err := ReadCommands(c.rd.Bytes())
+	//for {
+	resp, _ := decoder.Decode()
+	//if err != nil {
+	//	c.wr.WriteError("ERR " + err.Error())
+	//	return c.wr.Buffer(), gnet.None
+	//}
+	//if err != nil || resp == nil {
+	//	break
+	//}
+	c.rd.resps = append(c.rd.resps, resp)
+	//}
+	//c.rd.Reset()
+	//if len(lastbyte) > 0 {
+	//	c.rd.Write(lastbyte)
+	//} else {
+	//	for len(c.rd.resps) > 0 {
+	//		resp := c.rd.resps[0]
+	//		if len(c.rd.resps) == 1 {
+	//			c.rd.resps = nil
+	//		} else {
+	//			c.rd.resps = c.rd.resps[1:]
+	//		}
+	//		s.handler(c, resp)
+	//	}
+	//}
+	for len(c.rd.resps) > 0 {
+		resp := c.rd.resps[0]
+		if len(c.rd.resps) == 1 {
+			c.rd.resps = nil
+		} else {
+			c.rd.resps = c.rd.resps[1:]
 		}
+		s.handler(c, resp)
 	}
 	if len(c.wr.Buffer()) > 0 {
 		defer c.wr.Flush()
@@ -88,7 +104,7 @@ func (s *Server) OnTick() (delay time.Duration, action gnet.Action) {
 	return
 }
 
-func ListenAndServe(options Options, handler func(conn Conn, cmd Command)) {
+func ListenAndServe(options Options, handler func(conn Conn, resp *credis.Resp)) {
 	server := &Server{
 		laddr:     fmt.Sprintf("tcp://:%d", options.Port),
 		handler:   handler,

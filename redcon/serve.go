@@ -1,6 +1,9 @@
 package redcon
 
-import "strings"
+import (
+	"redcon/pkg/resparse/credis"
+	"strings"
+)
 
 type ServeMux struct {
 	handlers map[string]Handler
@@ -12,7 +15,7 @@ func NewServeMux() *ServeMux {
 	}
 }
 
-func (m *ServeMux) HandleFunc(command string, handler func(conn Conn, cmd Command)) {
+func (m *ServeMux) HandleFunc(command string, handler func(conn Conn, resp *credis.Resp)) {
 	if handler == nil {
 		panic("redcon: nil handler")
 	}
@@ -33,11 +36,11 @@ func (m *ServeMux) Handle(command string, handler Handler) {
 	m.handlers[command] = handler
 }
 
-func (m *ServeMux) ServeRESP(conn Conn, cmd Command) {
-	command := strings.ToLower(string(cmd.Args[0]))
+func (m *ServeMux) ServeRESP(conn Conn, resp *credis.Resp) {
+	command := strings.ToLower(string(resp.Array[0].Value))
 
 	if handler, ok := m.handlers[command]; ok {
-		handler.ServeRESP(conn, cmd)
+		handler.ServeRESP(conn, resp)
 	} else {
 		conn.WriteError("ERR unknown command '" + command + "'")
 	}
