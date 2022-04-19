@@ -2,12 +2,10 @@ module redcon
 
 go 1.17
 
-require (
-	github.com/panjf2000/gnet v1.6.4
-	github.com/panjf2000/gnet/v2 v2.0.2
-)
+require github.com/panjf2000/gnet v1.6.4
 
 require (
+	github.com/panjf2000/ants/v2 v2.4.8 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
