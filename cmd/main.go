@@ -10,12 +10,15 @@ import (
 func main() {
 	var port int
 	var multicore bool
-	flag.IntVar(&port, "port", 6380, "server port")
+	var reuseport bool
+	flag.IntVar(&port, "port", 6379, "server port")
 	flag.BoolVar(&multicore, "multicore", false, "multicore")
+	flag.BoolVar(&reuseport, "reuseport", false, "reuseport")
 	flag.Parse()
 	options := redcon.Options{
 		Options: gnet.Options{
 			Multicore: multicore,
+			ReusePort: reuseport,
 		},
 		Port: port,
 	}
@@ -24,5 +27,6 @@ func main() {
 	mux.HandleFunc("ping", handle.Ping)
 	mux.HandleFunc("set", handle.Set)
 	mux.HandleFunc("get", handle.Get)
+	mux.HandleFunc("echo", handle.Echo)
 	redcon.ListenAndServe(options, mux.ServeRESP)
 }

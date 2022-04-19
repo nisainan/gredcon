@@ -49,3 +49,11 @@ func (h *Handler) Get(conn redcon.Conn, cmd redcon.Command) {
 		conn.WriteBulk(val)
 	}
 }
+
+func (h *Handler) Echo(conn redcon.Conn, cmd redcon.Command) {
+	if len(cmd.Args) != 2 {
+		conn.WriteError("ERR wrong number of arguments for '" + string(cmd.Args[0]) + "' command")
+		return
+	}
+	conn.WriteBulk(cmd.Args[1])
+}
