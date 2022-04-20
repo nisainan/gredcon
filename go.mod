@@ -1,4 +1,4 @@
-module redcon
+module github.com/nisainan/redcon-gnet
 
 go 1.17
 

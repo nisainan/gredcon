@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"redcon/redcon"
+	"github.com/nisainan/redcon-gnet/redcon"
 	"sync"
 )
 

@@ -2,9 +2,9 @@ package main
 
 import (
 	"flag"
+	"github.com/nisainan/redcon-gnet/handler"
+	"github.com/nisainan/redcon-gnet/redcon"
 	"github.com/panjf2000/gnet"
-	"redcon/handler"
-	"redcon/redcon"
 )
 
 func main() {
