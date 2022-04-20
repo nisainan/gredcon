@@ -44,8 +44,8 @@ func (s *Server) OnOpened(c gnet.Conn) (out []byte, action gnet.Action) {
 }
 
 func (s *Server) OnClosed(c gnet.Conn, err error) (action gnet.Action) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
+	s.mu.Lock()
+	defer s.mu.Unlock()
 	delete(s.conns, c)
 	return gnet.None
 }
@@ -59,7 +59,7 @@ func (s *Server) React(frame []byte, conn gnet.Conn) (out []byte, action gnet.Ac
 	if err != nil {
 		defer c.wr.Flush()
 		c.wr.WriteError("ERR " + err.Error())
-		return c.wr.Buffer(), gnet.None
+		return c.wr.Buffer(), gnet.Close
 	}
 	c.rd.cmds = append(c.rd.cmds, cmds...)
 	c.rd.Reset()
