@@ -78,3 +78,7 @@ GET: 11428028.00 requests per second
 ## License
 
 GRedcon source code is available under the MIT [License](https://github.com/nisainan/gredcon/blob/master/LICENSE).
+
+## Thanks 
+
+[redcon](https://github.com/tidwall/redcon),[gnet](https://github.com/panjf2000/gnet)
